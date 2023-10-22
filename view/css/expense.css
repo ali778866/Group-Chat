@@ -1,0 +1,184 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'poppins', sans-serif;
+}
+
+body {
+  display: grid;
+  width: 100%;
+  padding: 15px 40px;
+}
+
+.form input {
+  margin-top: 10px;
+  margin-right: 12px;
+  margin-bottom: 5px;
+  background: transparent;
+  border-radius: 7px;
+  font-size: medium;
+  padding: 3px 7px;
+}
+
+.form select {
+  margin-bottom: 7px;
+  margin-right: 15px;
+  background: transparent;
+  border-radius: 7px;
+  font-size: medium;
+  padding: 3px 5px;
+}
+
+.btn {
+  margin-bottom: 10px;
+  padding: 8px 16px;
+  border-radius: 5px;
+  background-color: rgb(23, 136, 136);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: medium;
+}
+
+.btn:hover {
+  background-color: rgba(31, 172, 125, 0.899);
+}
+
+.list-group {
+  margin-top: 20px;
+  position: relative;
+  left: 20px;
+  font-size: medium;
+}
+
+.list-group li {
+  margin-bottom: 5px;
+}
+
+.list-group button {
+  background-color: rgb(16, 189, 189);
+  cursor: pointer;
+  font-size: medium;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.list-group button:hover {
+  background-color: rgba(31, 172, 125, 0.899);
+}
+
+nav {
+  background-color: #7c6868;
+  width: 100%;
+  color: #fff;
+  padding: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navName {
+ text-align: center;
+ font-size: smaller;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+  margin-left: 20px;
+}
+
+.btn2 {
+  margin-right: 20px;
+  font-size: medium;
+  padding: 2px 8px;
+  background-color: #f44336;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn2:hover {
+  background-color: #d32f2f;
+}
+
+.hide {
+  display : none;
+}
+
+.btn3 {
+  margin: 7px 7px;
+  background-color: rgb(245, 170, 22);
+  cursor: pointer;
+  font-size: larger;
+  font-weight: 700;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 5px;
+}
+
+.btn3:hover {
+  background-color: rgb(227, 156, 12);
+}
+
+.btnl {
+  visibility:hidden;
+  margin-right: 20px;
+  padding: 8px 16px;
+  background-color: #f44336;
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+table,
+    th,
+    td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+
+/* Pagination container */
+.pagination-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Pagination buttons */
+.pagination-button {
+  display: inline-block;
+  margin: 0 5px;
+  padding: 5px 10px;
+  background-color: #007bff; /* Change this to your desired button color */
+  color: #fff; /* Text color for the button */
+  border: 1px solid #007bff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.pagination-button:hover {
+  background-color: #0056b3; /* Change this to the hover color you prefer */
+}
+
+/* Disable styles for previous and next buttons when not applicable */
+.pagination-button:disabled {
+  background-color: #ddd;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Active page button */
+.pagination-button.active {
+  background-color: #0056b3; /* Change this to the active button color */
+}
+
+/* Optional: Center align text in buttons */
+.pagination-button h2 {
+  margin: 0;
+  text-align: center;
+}
