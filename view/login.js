@@ -2,12 +2,12 @@ let eyeicon = document.getElementById("eyeicon");
 let password = document.getElementById("password");
 
 eyeicon.onclick = () => {
-    if(password.type === "password") {
+    if (password.type === "password") {
         password.type = "text";
         eyeicon.src = "./css/eye-open.png"
     } else {
         password.type = "password";
-        eyeicon.src="./css/eye-close.png"
+        eyeicon.src = "./css/eye-close.png"
     }
 }
 
@@ -18,4 +18,14 @@ async function logInUser(event) {
     const user = {
         email, password
     }
+    await axios.post("http://localhost:2000/user/login", user)
+        .then(response => {
+            if (response.data.success) {
+                alert(response.data.message)
+            } else {
+                alert(response.data.message)
+            }
+
+        })
+        .catch(err => console.log(err))
 }
