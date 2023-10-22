@@ -4,10 +4,10 @@ let password = document.getElementById("password");
 eyeicon.onclick = () => {
     if(password.type === "password") {
         password.type = "text";
-        eyeicon.src = "/css/eye-open.png"
+        eyeicon.src = "./css/eye-open.png"
     } else {
         password.type = "password";
-        eyeicon.src="/css/eye-close.png"
+        eyeicon.src="./css/eye-close.png"
     }
 }
 

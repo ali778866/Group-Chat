@@ -4,10 +4,10 @@ let password = document.getElementById("password");
 eyeicon.onclick = () => {
     if(password.type === "password") {
         password.type = "text";
-        eyeicon.src = "/css/eye-open.png"
+        eyeicon.src = "./css/eye-open.png"
     } else {
         password.type = "password";
-        eyeicon.src="/css/eye-close.png"
+        eyeicon.src="./css/eye-close.png"
     }
 }
 
@@ -20,7 +20,7 @@ function saveUser(event) {
     const user = {
         name, email, phone, password
     }
-    axios.post("http://localhost:4500/user/signup", user)
+    axios.post("http://localhost:2000/user/signup", user)
     
         .then(response => {
             alert(response.data.message)
