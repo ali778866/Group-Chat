@@ -22,6 +22,8 @@ async function logInUser(event) {
         .then(response => {
             if (response.data.success) {
                 alert(response.data.message)
+                localStorage.setItem('token', response.data.token)
+                localStorage.setItem('userId', response.data.userId)
             } else {
                 alert(response.data.message)
             }
