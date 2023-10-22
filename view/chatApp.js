@@ -2,12 +2,15 @@ window.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem('token')
     const decoded = parseJwt(token);
     document.getElementById('userName').textContent = decoded.name;
-    axios.get("http://localhost:2000/chat/get-chat", { headers: { "Authorization": token } })
-    .then((response) => {
-        for (let allMessage of response.data.allMessage){
-            displayMessage('You', allMessage.message);
-        }
-    })
+    setInterval(() => {
+        axios.get("http://localhost:2000/chat/get-chat", { headers: { "Authorization": token } })
+          .then((response) => {
+            const newMessages = response.data.allMessage;
+            newMessages.forEach((message) => {
+              displayMessage('You', message.message);
+            });
+          });
+      }, 1000);
 })
 
 function parseJwt(token) {
