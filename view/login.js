@@ -24,6 +24,7 @@ async function logInUser(event) {
                 alert(response.data.message)
                 localStorage.setItem('token', response.data.token)
                 localStorage.setItem('userId', response.data.userId)
+                window.location.href="./chatApp.html"
             } else {
                 alert(response.data.message)
             }
