@@ -1,13 +1,28 @@
+const messageInput = document.getElementById('message-input');
+const sendButton = document.getElementById('send-button');
+const chatMessages = document.getElementById('chat-messages');
+
+
 window.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem('token')
+    let oldChat = JSON.parse(localStorage.getItem('localchat')) || []
+    let lastMsgId = oldChat.length > 0 ? oldChat[oldChat.length - 1].id : 0;
+    console.log('last msgid' , lastMsgId)
     const decoded = parseJwt(token);
     document.getElementById('userName').textContent = decoded.name;
     setInterval(() => {
-        axios.get("http://localhost:2000/chat/get-chat", { headers: { "Authorization": token } })
-          .then((response) => {
+        axios.get(`http://localhost:2000/chat/get-chat?lastmsgid=${lastMsgId}`, { headers: { "Authorization": token } })
+        .then((response) => {
             const newMessages = response.data.allMessage;
-            newMessages.forEach((message) => {
-              displayMessage('You', message.message);
+            let localChat = oldChat.concat(newMessages)
+            if (localChat.length > 10) {
+                localChat = localChat.slice(localChat.length - 10);
+            }
+            localStorage.setItem('localchat', JSON.stringify(localChat))
+            console.log(localChat);
+            chatMessages.innerHTML = '';
+            localChat.forEach((message) => {
+              displayMessage(message.name, message.message);
             });
           });
       }, 1000);
@@ -22,15 +37,15 @@ function parseJwt(token) {
     return JSON.parse(jsonPayload);
 }
 
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-const chatMessages = document.getElementById('chat-messages');
 
 sendButton.addEventListener('click', () => {
     const userId = localStorage.getItem('userId')
     const message = messageInput.value;
+    const token = localStorage.getItem('token')
+    const name = parseJwt(token).name;
     const obj = {
         message,
+        name,
         userId
     }
     if (message) {
@@ -44,8 +59,6 @@ sendButton.addEventListener('click', () => {
 
 
 function displayMessage(sender, text) {
-    const messageDiv = document.createElement('div');
-    messageDiv.innerHTML = `<strong>${sender}:</strong> ${text}`;
-    chatMessages.appendChild(messageDiv);
+    chatMessages.innerHTML += `<b>${sender}:</b> ${text}<br>`;
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
