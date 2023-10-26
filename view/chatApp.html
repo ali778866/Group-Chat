@@ -7,18 +7,45 @@
     <title>Group Chat App</title>
 </head>
 <body>
-    
-    <div id="chat-container">
-        <nav>
+    <div class="main">
+        <div id="chat-container" class="chat-container">
+            <nav>
+                <div>
+                    <h2>Chat App</h2>
+                </div>
+                <p id="userName" class="navName"></p>
+            </nav>
+            <div id="chat-messages" class="chat-messages"></div>
             <div>
-                <h2>Chat App</h2>
+                <input type="text" id="message-input" class="message-input" placeholder="Type your message">
+                <button id="send-button">Send</button>
             </div>
-            <p id="userName" class="navName"></p>
-        </nav>
-        <div id="chat-messages"></div>
-        <div>
-            <input type="text" id="message-input" placeholder="Type your message">
-            <button id="send-button">Send</button>
+        </div>
+        <div class="menu" >
+            <div class="menuscr">
+                <button id="groupButton">Create Group</button>
+                <button onclick="redirectLogin()">Logout</button>
+                <div id="menu"></div>
+            </div>
+            <div id="group" class="grpscr"></div>
+        </div>
+    </div>
+    <div class="popup">
+        <div class="popup-content">
+            <img src="./css/close.png" alt="close" class="close">
+            <h2>Create Group</h2>
+            <form onsubmit="createGroup(event)">
+                <input type="text" name="groupName" placeholder="Enter Group Name">
+                <button type="submit">Create</button>
+            </form>
+        </div>
+    </div>
+    <div class="popup2">
+        <div class="popup-content2">
+            <img src="./css/close.png" alt="close" class="close2">
+            <h2>Add Participants</h2>
+            <form onsubmit="addParticipant(event)" id="participant">
+            </form>
         </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>

@@ -1,24 +1,28 @@
-const User  = require('../model/user');
+const User = require('../model/user');
+const Group = require('../model/group')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 exports.signupUser = async (req, res, next) => {
-    try {const name = req.body.name;
+    try {
+        const name = req.body.name;
         const email = req.body.email;
         const phone = req.body.phone;
         const password = req.body.password;
-        const existingUser = await User.findOne({ where: {email: email}})
-        if(existingUser){
-            res.json({message : "User Already Exist!"})
-        }else {
+        const existingUser = await User.findOne({ where: { email: email } })
+        if (existingUser) {
+            res.json({ message: "User Already Exist!" })
+        } else {
             bcrypt.hash(password, 10, async (err, hash) => {
-                  await User.create({
+                const user = await User.create({
                     name: name,
-                    email: email, 
+                    email: email,
                     phone: phone,
                     password: hash
                 })
-                res.status(201).json({message : "User Signup Successfully!"})
+                const group = await Group.findByPk(1);
+                await user.addGroup(group);
+                res.status(201).json({ message: "User Signup Successfully!" })
             })
         }
     } catch { err => console.log(err) }
@@ -28,27 +32,49 @@ exports.loginUser = async (req, res, next) => {
     try {
         const email = req.body.email;
         const password = req.body.password;
-        await User.findAll({ where: {email: email}})
-        .then( user => {
-            if(user.length > 0){
-                bcrypt.compare(password, user[0].password, (err, response) => {
-                    if(err){
-                        res.status(500).json({success: false, message: "Something went wrong"})
-                    }
-                    if(response === true){
-                        res.status(200).json({success: true, message : "login Successfully", userId: user[0].id, token: generateToken(user[0].id, user[0].name) })
-                    } else {
-                        return res.json({success: false, message: "Password is incorrect"});
-                    }
-                })
-            }else{
-                return res.json({success: false, message : "User Not Exist"});
-        }
-    }).catch(err => console.log(err))
-       
+        await User.findAll({ where: { email: email } })
+            .then(async user => {
+                if (user.length > 0) {
+                    // const groups = await user[0].getGroups();
+                    bcrypt.compare(password, user[0].password, (err, response) => {
+                        if (err) {
+                            res.status(500).json({ success: false, message: "Something went wrong" })
+                        }
+                        if (response === true) {
+                            res.status(200).json({
+                                success: true,
+                                message: "login Successfully",
+                                userId: user[0].id,
+                                token: generateToken(user[0].id, user[0].name)
+                            })
+                        } else {
+                            return res.json({ success: false, message: "Password is incorrect" });
+                        }
+                    })
+                } else {
+                    return res.json({ success: false, message: "User Not Exist" });
+                }
+            }).catch(err => console.log(err))
+
     } catch { err => console.log(err) }
 }
 
 const generateToken = (id, name) => {
-    return jwt.sign({ userId : id , name : name }, 'secret');
+    return jwt.sign({ userId: id, name: name }, 'secret');
+}
+
+exports.showParticipants = async (req, res, next) => {
+    const groupid = req.params.id
+    const group = await Group.findByPk(groupid);
+    const usersInGroup = await group.getUsers();
+    const users = await User.findAll();
+    const usersNotInGroup = users.filter(user => {
+        return !usersInGroup.some(userInGrp => userInGrp.id === user.id)
+    })
+    const mappedUser = usersNotInGroup.map( user => ({
+        id: user.id,
+        name: user.name
+    }))
+    // console.log(mappedUser)
+    res.json({users: mappedUser});
 }
