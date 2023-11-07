@@ -34,8 +34,8 @@ Chat.belongsTo(User);
 Group.hasMany(Chat);
 Chat.belongsTo(Group);
 
-User.belongsToMany(Group, { through: 'UserGroup' });
-Group.belongsToMany(User, { through: 'UserGroup' });
+User.belongsToMany(Group, { through: 'group_users' });
+Group.belongsToMany(User, { through: 'group_users' });
 
 sequelize
     // .sync({force: true})

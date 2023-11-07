@@ -2,6 +2,7 @@ const User = require('../model/user');
 const Group = require('../model/group')
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const Group_users = require('../model/groupUsers');
 
 exports.signupUser = async (req, res, next) => {
     try {
@@ -71,10 +72,43 @@ exports.showParticipants = async (req, res, next) => {
     const usersNotInGroup = users.filter(user => {
         return !usersInGroup.some(userInGrp => userInGrp.id === user.id)
     })
-    const mappedUser = usersNotInGroup.map( user => ({
+    const mappedUser = usersNotInGroup.map(user => ({
         id: user.id,
         name: user.name
     }))
-    // console.log(mappedUser)
-    res.json({users: mappedUser});
+    console.log(mappedUser)
+    res.json({ users: mappedUser });
+}
+
+exports.getParticipants = async (req, res, next) => {
+    const groupid = req.params.id;
+    const group = await Group.findByPk(groupid);
+    const usersByAlldata = await group.getUsers();
+    const usersByAdminData = await Group_users.findAll({ where: { GroupId: groupid } })
+
+    const userTable = usersByAlldata.map(user => ({
+        userId: user.id,
+        name: user.name
+    }))
+
+    const adminTable = usersByAdminData.map(data => ({
+        userId: data.userId,
+        isAdmin: data.admin
+    }))
+
+    const adminMap = new Map(adminTable.map(adminUser => [adminUser.userId, adminUser.isAdmin]));
+
+    userTable.forEach(user => {
+        user.isAdmin = adminMap.get(user.userId) ? 1 : 0;
+    });
+
+    console.log(userTable);
+    res.json({ users: userTable });
+}
+
+exports.getUserData = async (req, res, next) =>{
+    const userid = req.params.id;
+    const groupid = parseFloat(req.query.groupid)
+    const user = await Group_users.findAll({where: {userId: userid, groupId: groupid }})
+    res.json({ user: user });
 }

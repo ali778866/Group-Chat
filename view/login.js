@@ -1,13 +1,22 @@
 let eyeicon = document.getElementById("eyeicon");
 let password = document.getElementById("password");
+const sign = document.getElementById("sign");
 
-eyeicon.onclick = () => {
-    if (password.type === "password") {
-        password.type = "text";
-        eyeicon.src = "./css/eye-open.png"
-    } else {
-        password.type = "password";
-        eyeicon.src = "./css/eye-close.png"
+sign.onclick = () => {
+    if (sign.textContent == 'Sign Up') {
+        document.querySelector(".login-section").style.display = "none";
+        document.querySelector(".signup-section").style.display = "flex";
+        document.querySelector(".seperator-text").style.display = "none"
+        document.querySelector(".social-login").style.display = "none"
+        document.querySelector(".p").textContent = "Have an account!";
+        sign.textContent = "logIn";
+    } else if (sign.textContent == 'logIn') {
+        document.querySelector(".signup-section").style.display = "none";
+        document.querySelector(".login-section").style.display = "flex";
+        document.querySelector(".seperator-text").style.display = "block"
+        document.querySelector(".social-login").style.display = "block"
+        document.querySelector(".p").textContent = "Don't have an account?";
+        sign.textContent = "Sign Up";
     }
 }
 
@@ -24,11 +33,29 @@ async function logInUser(event) {
                 alert(response.data.message)
                 localStorage.setItem('token', response.data.token)
                 localStorage.setItem('userId', response.data.userId)
-                window.location.href="./chatApp.html"
+                window.location.href = "./chatApp.html"
             } else {
                 alert(response.data.message)
             }
 
+        })
+        .catch(err => console.log(err))
+}
+
+function saveUser(event) {
+    event.preventDefault()
+    const name = event.target.name.value;
+    const email = event.target.email1.value;
+    const phone = event.target.phone.value
+    const password = event.target.password1.value;
+    const user = {
+        name, email, phone, password
+    }
+    axios.post("http://localhost:2000/user/signup", user)
+    
+        .then(response => {
+            alert(response.data.message)
+            window.location.href="./index.html"
         })
         .catch(err => console.log(err))
 }

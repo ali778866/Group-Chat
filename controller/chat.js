@@ -23,10 +23,10 @@ exports.groupChat = async (req, res, next) => {
         const chat = await Chat.findAll({ where: { groupId: groupid } })
         const newChat = await Chat.findAll({where: {id: {[Op.gt]:lastMsgId}}});
         const nChat = newChat.map(chat => ({
-            id: chat.dataValues.id,
-            message: chat.dataValues.message,
-            name: chat.dataValues.name,
-            groupId: chat.dataValues.groupId
+            id: chat.id,
+            message: chat.message,
+            name: chat.name,
+            groupId: chat.groupId
         }));
         res.status(200).json({
             allMessage: nChat

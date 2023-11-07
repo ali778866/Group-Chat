@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Chatapp Login</title>
+</head>
+<body>
+    <div class="container">
+        <div class="left-section"></div>
+        <div class="right-section">
+            <div class="header-text">Get Started</div>
+            <form onsubmit="logInUser(event)" class="login-section">
+                <div class="form-input">
+                    <input type="email" name="email" id="email" placeholder="Email" required>
+                </div>
+                <div class="form-input">
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                </div>
+                <div class="term-condition">
+                    By clicking below button, you agree to our
+                    <a href="">Terms</a> and <a href="">Privacy</a>
+                </div>
+                <button class="btn-sign-in">Sign In</button>
+            </form>
+            <form onsubmit="saveUser(event)" class="signup-section">
+                <div class="form-input">
+                    <input type="text" name="name" id="name" placeholder="Name" required>
+                </div>
+                <div class="form-input">
+                    <input type="email" name="email1" id="email1" placeholder="Email" required>
+                </div>
+                <div class="form-input">
+                    <input type="text" name="phone" id="phone" placeholder="Phone Number" required>
+                </div>
+                <div class="form-input">
+                    <input type="password" name="password1" id="password1" placeholder="Password" required>
+                </div>
+                <div class="term-condition">
+                    By clicking below button, you agree to our
+                    <a href="">Terms</a> and <a href="">Privacy</a>
+                </div>
+                <button class="btn-sign-in">Sign In</button>
+            </form>
+            <div class="forget-password">
+                Forgot password?
+            </div>
+            <div class="seperator-text">
+                or <strong>Continue</strong> with
+            </div>
+            <div class="social-login">
+                <button><img src="assets/google-logo.png" alt="Google"></button>
+                <button><img src="assets/facebook-logo.png" alt="Facebook"></button>
+                <button><img src="assets/apple-logo.png" alt="Apple"></button>
+            </div>
+            <div class="sign-up-redirect">
+                <p class="p">Don't have an account?
+                    <div class="sign" id="sign">Sign Up</div>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script src="./login.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</body>
+</html>

@@ -14,4 +14,12 @@ router.get('/get-group/:id', authenticate.authenticate, groupController.getGroup
 
 router.post('/add-participants/:id', groupController.addParticipants)
 
+router.post('/make-admin', groupController.makeAdmin)
+
+router.post('/remove-admin', groupController.removeAdmin)
+
+router.post('/remove-from-group', groupController.removeFromGroup)
+
+router.delete('/delete-group/:id', groupController.deleteGroup)
+
 module.exports = router;
