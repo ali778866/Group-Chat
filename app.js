@@ -3,7 +3,12 @@ const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
 const sequelize = require('./utility/database')
+const http = require('http');
 const app = express();
+
+const server = http.createServer(app);
+const socketIo = require('socket.io');
+const io = socketIo(server);
 
 app.use(bodyParser.json({ extended: false }));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -13,6 +18,20 @@ app.use(cors({
     origin: 'http://127.0.0.1:5500',
 }));
 
+
+io.on('connection', (socket) => {
+    // socket.on('join-group', (id) => {
+    //     socket.join(id);
+    // })
+    socket.on('user-message', (message) => {
+        // if(groupId === '') {
+            socket.broadcast.emit('message', message)
+        // }else {
+            // socket.to(groupId).emit('message', message);
+        // }
+    })
+});
+
 const User = require('./model/user');
 const Chat = require('./model/chat');
 const Group = require('./model/group');
@@ -21,7 +40,7 @@ const userRoutes = require('./router/user');
 const chatRoutes = require('./router/chat');
 const groupRoutes = require('./router/group')
 
-const staticPath = path.join(__dirname, "./view")
+const staticPath = path.resolve("./view")
 app.use(express.static(staticPath));
 
 app.use('/user', userRoutes);
@@ -50,6 +69,6 @@ sequelize
         return group;
     })
     .then(result => {
-        app.listen(process.env.PORT || 2000);
+        server.listen(process.env.PORT || 2000);
     })
     .catch(err => console.log(err))

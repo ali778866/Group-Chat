@@ -22,6 +22,11 @@ document.querySelector(".close3").addEventListener("click", () => {
 function redirectLogin() {
     window.location.href = "./index.html"
 }
+const socket = io();
+
+// socket.on('message', (message) => {
+//     displayMessage('name', message)
+// })
 
 window.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem('token')
@@ -70,6 +75,7 @@ sendButton.addEventListener('click', () => {
     if (message) {
         axios.post("http://localhost:2000/chat/add-chat", obj)
             .then((response) => {
+                socket.emit('user-message', message)
                 displayMessage('You', response.data.message);
             })
         messageInput.value = '';
@@ -109,6 +115,7 @@ function getGroup(group, id) {
 }
 
 function showGroup(id) {
+    // socket.emit('join-group', id)
     localStorage.setItem("groupId", id)
     document.getElementById("chat-container").style.display = "block";
     document.querySelector(".main").style.display = "grid";
@@ -183,6 +190,9 @@ function addParticipant(event) {
 }
 
 function showGroupMessage(groupid) {
+    socket.on('message', (message) => {
+        displayMessage('name', message)
+    })
     const token = localStorage.getItem('token')
     let oldChat = JSON.parse(localStorage.getItem(`localchat${groupid}`)) || []
     let lastMsgId = oldChat.length > 0 ? oldChat[oldChat.length - 1].id : 0;
