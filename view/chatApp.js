@@ -22,7 +22,7 @@ document.querySelector(".close3").addEventListener("click", () => {
 function redirectLogin() {
     window.location.href = "./index.html"
 }
-const socket = io();
+// const socket = io();
 
 // socket.on('message', (message) => {
 //     displayMessage('name', message)
@@ -60,10 +60,43 @@ deleteGrp.addEventListener('click', () => {
     deleteGroup(groupId);
 });
 
+async function uploadFiles(event) {
+    event.preventDefault();
+    const token = localStorage.getItem('token')
+    const groupId = localStorage.getItem('groupId')
+    const userId = parseJwt(token).userId
+    const name = parseJwt(token).name;
+    const fileInput = document.getElementById('file');
+    const uploadedfile = fileInput.files[0];
+
+    if (uploadedfile) {
+        const formData = new FormData();
+        formData.append("file", uploadedfile);
+        formData.append("name", name);
+        formData.append("userId", userId);
+        formData.append("groupId", groupId);
+        // console.log(formData.get)
+        try {
+            await axios.post("http://localhost:2000/chat/add-file", formData)
+                .then((response) => {
+                    console.log(response.data)
+
+                    displayimage('You', response.data.message);
+                })
+        } catch (err) {
+            console.log(err);
+        }
+    } else {
+        alert("Please select a file");
+    }
+}
+
+
 sendButton.addEventListener('click', () => {
     const token = localStorage.getItem('token')
     const groupId = localStorage.getItem('groupId')
     const message = messageInput.value;
+    console.log(messageInput.value);
     const userId = parseJwt(token).userId
     const name = parseJwt(token).name;
     const obj = {
@@ -75,13 +108,17 @@ sendButton.addEventListener('click', () => {
     if (message) {
         axios.post("http://localhost:2000/chat/add-chat", obj)
             .then((response) => {
-                socket.emit('user-message', message)
+                // socket.emit('user-message', message)
                 displayMessage('You', response.data.message);
             })
         messageInput.value = '';
     }
 });
 
+function displayimage(sender, text) {
+    chatMessages.innerHTML += `<b>${sender}:</b> <img src="${text}" style="width:40vw;height:auto" class="message-text"><br>`;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+}
 
 function displayMessage(sender, text) {
     chatMessages.innerHTML += `<b>${sender}:</b> ${text}<br>`;
@@ -103,10 +140,10 @@ function createGroup(event) {
 
 function deleteGroup(groupid) {
     axios.delete(`http://localhost:2000/group/delete-group/${groupid}`)
-    .then(response=>{
-        alert(response.data.message);
-    
-    })
+        .then(response => {
+            alert(response.data.message);
+
+        })
 }
 
 function getGroup(group, id) {
@@ -144,15 +181,15 @@ function showEdits(userId, groupId) {
     const usersElm = document.getElementById("userAction");
     usersElm.innerHTML = '';
     axios.get(`http://localhost:2000/user/get-user-data/${userId}?groupid=${groupId}`)
-    .then(response => {
-        const userData = response.data.user
-        if(userData[0].admin === true){
-            usersElm.innerHTML += `<div class="group" onclick="removeAdmin(${userData[0].userId}, ${userData[0].groupId})">Dismiss as admin</div><br>`
-        }else{
-            usersElm.innerHTML += `<div class="group" onclick="makeAdmin(${userData[0].userId}, ${userData[0].groupId})">Make Admin</div><br>` 
-        }
-        usersElm.innerHTML += `<div class="group" onclick="removeFromGroup(${userData[0].userId}, ${userData[0].groupId})">remove from group</div>`
-    })
+        .then(response => {
+            const userData = response.data.user
+            if (userData[0].admin === true) {
+                usersElm.innerHTML += `<div class="group" onclick="removeAdmin(${userData[0].userId}, ${userData[0].groupId})">Dismiss as admin</div><br>`
+            } else {
+                usersElm.innerHTML += `<div class="group" onclick="makeAdmin(${userData[0].userId}, ${userData[0].groupId})">Make Admin</div><br>`
+            }
+            usersElm.innerHTML += `<div class="group" onclick="removeFromGroup(${userData[0].userId}, ${userData[0].groupId})">remove from group</div>`
+        })
 }
 
 function showParticipants(groupid) {
@@ -190,9 +227,9 @@ function addParticipant(event) {
 }
 
 function showGroupMessage(groupid) {
-    socket.on('message', (message) => {
-        displayMessage('name', message)
-    })
+    // socket.on('message', (message) => {
+    //     displayMessage('name', message)
+    // })
     const token = localStorage.getItem('token')
     let oldChat = JSON.parse(localStorage.getItem(`localchat${groupid}`)) || []
     let lastMsgId = oldChat.length > 0 ? oldChat[oldChat.length - 1].id : 0;
@@ -235,9 +272,9 @@ function participantFn() {
             participants.forEach(user => {
                 console.log(user);
                 if (user.isAdmin === 1) {
-                    if(decoded.userId ===user.userId){
-                        usersElm.innerHTML += `<div>You are Admin </div>`  
-                    }else{
+                    if (decoded.userId === user.userId) {
+                        usersElm.innerHTML += `<div>You are Admin </div>`
+                    } else {
                         usersElm.innerHTML += `<div>${user.name} Admin 
                         <button class="btn1" onclick="removeAdmin(${user.userId}, ${groupId})">Remove from Admin</button> </div>`
                     }

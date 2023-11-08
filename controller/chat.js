@@ -1,7 +1,11 @@
 const Chat = require('../model/chat');
+const AchivedChat = require('../model/achivedChat')
+const fs = require('fs');
 const User = require('../model/user');
 const Group = require('../model/group');
 const { Op } = require("sequelize");
+const S3Services = require('../services/S3services');
+const cron = require('node-cron');
 
 exports.postChat = async (req, res, next) => {
     try {
@@ -21,7 +25,7 @@ exports.groupChat = async (req, res, next) => {
         lastMsgId = parseFloat(req.query.lastmsgid)
         const groupid = req.params.id;
         const chat = await Chat.findAll({ where: { groupId: groupid } })
-        const newChat = await Chat.findAll({where: {id: {[Op.gt]:lastMsgId}}});
+        const newChat = await Chat.findAll({ where: { id: { [Op.gt]: lastMsgId } } });
         const nChat = newChat.map(chat => ({
             id: chat.id,
             message: chat.message,
@@ -34,4 +38,18 @@ exports.groupChat = async (req, res, next) => {
     } catch (err) {
         console.log('Error While Getting Chat!', err);
     }
+}
+
+exports.uploadFile = async (req, res, next) => {
+    const name = req.body.name;
+    const userId = req.body.userId;
+    const groupId = req.body.groupId;
+    const file = req.file
+    // const fileStream = fs.createReadStream(file.path)
+    const filename = `chat${userId}/${new Date()}`
+    console.log(file)
+    const fileURL = await S3Services.uploadToS3(file)
+    console.log(fileURL);
+    const message = await Chat.create({ message: fileURL, name: name, userId: userId, groupId: groupId });
+    res.status(201).json({ message: message.message })
 }

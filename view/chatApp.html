@@ -29,6 +29,10 @@
                 </ul>
             </nav>
             <div id="chat-messages" class="chat-messages"></div>
+            <form onsubmit="uploadFiles(event)">
+                <input type="file" id="file" accept="image/*"></input>
+                <button class="btn" type="submit">Send File</button>
+            </form>
             <div>
                 <input type="text" id="message-input" class="message-input" placeholder="Type your message">
                 <button id="send-button" class="btn">Send</button>
