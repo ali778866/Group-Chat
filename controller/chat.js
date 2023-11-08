@@ -7,6 +7,19 @@ const { Op } = require("sequelize");
 const S3Services = require('../services/S3services');
 const cron = require('node-cron');
 
+cron.schedule('* 20 * * * *', async () => {
+    console.log('code is running in cron')
+    const currentTimestamp = new Date();
+    currentTimestamp.setHours(currentTimestamp.getHours() - 48);
+    const chat = await Chat.findAll({ where: { createdAt: { [Op.lt]: currentTimestamp } } })
+
+    chat.forEach(async chat => {
+        await AchivedChat.create({ message: chat.message, name: chat.name, userId: chat.userId, groupId: chat.groupId })
+    })
+
+    await Chat.destroy({ where: { createdAt: { [Op.lt]: currentTimestamp } } })
+});
+
 exports.postChat = async (req, res, next) => {
     try {
         const chat = req.body.message;
