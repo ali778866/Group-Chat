@@ -1,11 +1,13 @@
 const User  = require('../model/user');
 const Group = require('../model/group');
 const Group_users = require('../model/groupUsers');
+const uuid = require('uuid');
 
 exports.createGroup = async (req, res, next) => {
     try{
     let groupName = req.body.groupName;
-    const group = await Group.create({groupname: groupName});
+    const id = uuid.v4();
+    const group = await Group.create({ id, groupname: groupName });
     const userGroup = await Group_users.create({admin: true, userId: req.user.id,groupId: group.id })
     // await req.user.addGroups(group)
     res.status(201).json({message: "Group Created Successfully", group: group})
@@ -57,12 +59,14 @@ exports.addParticipants = async (req, res, next) => {
 
 exports.makeAdmin = async (req, res, next) => {
     const adminData = req.body;
+
     await Group_users.update({admin:true}, {where: {userId: adminData.userId, groupId: adminData.groupId }})
     res.status(201).json({success: true, message: "User is now group admin"});
 }
 
 exports.removeAdmin = async (req, res, next) => {
     const adminData = req.body;
+    console.log(adminData.groupId)
     await Group_users.update({admin:false}, {where: {userId: adminData.userId, groupId: adminData.groupId }})
     res.status(201).json({success: true, message: "User is now not a Admin"});
 }

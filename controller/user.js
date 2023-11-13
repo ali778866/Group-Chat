@@ -82,6 +82,7 @@ exports.showParticipants = async (req, res, next) => {
 
 exports.getParticipants = async (req, res, next) => {
     const groupid = req.params.id;
+    const userId = req.user.id;
     const group = await Group.findByPk(groupid);
     const usersByAlldata = await group.getUsers();
     const usersByAdminData = await Group_users.findAll({ where: { GroupId: groupid } })
@@ -99,16 +100,19 @@ exports.getParticipants = async (req, res, next) => {
     const adminMap = new Map(adminTable.map(adminUser => [adminUser.userId, adminUser.isAdmin]));
 
     userTable.forEach(user => {
-        user.isAdmin = adminMap.get(user.userId) ? 1 : 0;
+        user.isAdmin = adminMap.get(user.userId) ? true : false;
     });
 
-    console.log(userTable);
-    res.json({ users: userTable });
+    const admins = await Group_users.findAll({ where: { GroupId: groupid, admin: true } });
+
+    const isAdmin = admins.find(admin => admin.userId === req.user.id) ? true : false;
+   
+    res.json({ users: userTable , admin: isAdmin});
 }
 
 exports.getUserData = async (req, res, next) =>{
     const userid = req.params.id;
-    const groupid = parseFloat(req.query.groupid)
+    const groupid = req.query.groupid;
     const user = await Group_users.findAll({where: {userId: userid, groupId: groupid }})
     res.json({ user: user });
 }

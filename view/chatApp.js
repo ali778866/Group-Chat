@@ -75,12 +75,10 @@ async function uploadFiles(event) {
         formData.append("name", name);
         formData.append("userId", userId);
         formData.append("groupId", groupId);
-        // console.log(formData.get)
         try {
             await axios.post("http://localhost:2000/chat/add-file", formData)
                 .then((response) => {
                     console.log(response.data)
-
                     displayimage('You', response.data.message);
                 })
         } catch (err) {
@@ -90,7 +88,6 @@ async function uploadFiles(event) {
         alert("Please select a file");
     }
 }
-
 
 sendButton.addEventListener('click', () => {
     const token = localStorage.getItem('token')
@@ -148,7 +145,7 @@ function deleteGroup(groupid) {
 
 function getGroup(group, id) {
     const menuElm = document.getElementById("menu")
-    menuElm.innerHTML += `<div class="group" onclick="showGroup(${id})">${group}</div>`
+    menuElm.innerHTML += `<div class="group" onclick="showGroup('${id}')">${group}</div>`
 }
 
 function showGroup(id) {
@@ -167,11 +164,11 @@ function showGroup(id) {
     axios.get(`http://localhost:2000/group/get-group/${id}`, { headers: { "Authorization": token } })
         .then(response => {
             groupElm.innerHTML += `<h2>${response.data.group.groupname}</h2>
-                                <button class="btn1" onclick="showParticipants(${response.data.group.id})">Add Participants</button>`;
+                                <button class="btn1" onclick="showParticipants('${response.data.group.id}')">Add Participants</button>`;
             navElement.innerText += `${response.data.group.groupname}`
             const users = response.data.users;
             users.forEach(user => {
-                groupElm.innerHTML += `<div class="group" onclick="showEdits(${user.id},${id})">${user.name}</div>`
+                groupElm.innerHTML += `<div class="group" onclick="showEdits(${user.id},'${id}')">${user.name}</div>`
             })
         })
 }
@@ -184,11 +181,11 @@ function showEdits(userId, groupId) {
         .then(response => {
             const userData = response.data.user
             if (userData[0].admin === true) {
-                usersElm.innerHTML += `<div class="group" onclick="removeAdmin(${userData[0].userId}, ${userData[0].groupId})">Dismiss as admin</div><br>`
+                usersElm.innerHTML += `<div class="group" onclick="removeAdmin(${userData[0].userId}, '${userData[0].groupId}')">Dismiss as admin</div><br>`
             } else {
-                usersElm.innerHTML += `<div class="group" onclick="makeAdmin(${userData[0].userId}, ${userData[0].groupId})">Make Admin</div><br>`
+                usersElm.innerHTML += `<div class="group" onclick="makeAdmin(${userData[0].userId}, '${userData[0].groupId}')">Make Admin</div><br>`
             }
-            usersElm.innerHTML += `<div class="group" onclick="removeFromGroup(${userData[0].userId}, ${userData[0].groupId})">remove from group</div>`
+            usersElm.innerHTML += `<div class="group" onclick="removeFromGroup(${userData[0].userId}, '${userData[0].groupId}')">remove from group</div>`
         })
 }
 
@@ -196,16 +193,8 @@ function showParticipants(groupid) {
     document.querySelector(".popup1").style.display = "flex";
     const usersElm = document.getElementById("addParticipant")
     usersElm.innerHTML = '';
-    axios.get(`http://localhost:2000/user/show-participants/${groupid}`)
-        .then(response => {
-            const participants = response.data.users;
-            participants.forEach(user => {
-                usersElm.innerHTML += `<div><input type="checkbox" name="user" value="${user.id}">${user.name}</div>`
-            })
-            usersElm.innerHTML += `<input type="hidden" name="groupid" value="${groupid}">`
-            usersElm.innerHTML += `<button class="btn1" type="submit">Add</button>`
-        })
-
+    usersElm.innerHTML += `<input type="hidden" name="groupid" value="${groupid}">`
+    // usersElm.innerHTML += `<button class="btn1" type="submit">Add</button>`
 }
 
 function addParticipant(event) {
@@ -238,7 +227,6 @@ function showGroupMessage(groupid) {
     axios.get(`http://localhost:2000/chat/get-group-chat/${groupid}?lastmsgid=${lastMsgId}`, { headers: { "Authorization": token } })
         .then((response) => {
             const newMessages = response.data.allMessage;
-            console.log(newMessages);
             chatMessages.innerHTML = '';
             let localChat = oldChat.concat(newMessages)
             if (localChat.length > 10) {
@@ -261,27 +249,36 @@ function showGroupMessage(groupid) {
 function participantFn() {
     const token = localStorage.getItem('token')
     const decoded = parseJwt(token);
-    console.log(decoded);
     const groupId = localStorage.getItem('groupId')
     document.querySelector(".popup3").style.display = "flex";
     const usersElm = document.getElementById("groupParticipant")
     usersElm.innerHTML = '';
-    axios.get(`http://localhost:2000/user/get-participants/${groupId}`)
+    axios.get(`http://localhost:2000/user/get-participants/${groupId}`, { headers: { "Authorization": token } })
         .then(response => {
             const participants = response.data.users;
-            participants.forEach(user => {
-                console.log(user);
-                if (user.isAdmin === 1) {
-                    if (decoded.userId === user.userId) {
-                        usersElm.innerHTML += `<div>You are Admin </div>`
+            const requestUserisAdmin = response.data.admin;
+            if (requestUserisAdmin) {
+                participants.forEach(user => {
+                    if (user.isAdmin === true) {
+                        if (decoded.userId === user.userId) {
+                            usersElm.innerHTML += `<div><b>You</b> are Group Admin </div>`
+                        } else {
+                            usersElm.innerHTML += `<div><b>${user.name}</b> Group Admin 
+                        <button class="btn1" onclick="removeAdmin(${user.userId}, '${groupId}')">Remove from Admin</button> </div>`
+                        }
                     } else {
-                        usersElm.innerHTML += `<div>${user.name} Admin 
-                        <button class="btn1" onclick="removeAdmin(${user.userId}, ${groupId})">Remove from Admin</button> </div>`
+                        usersElm.innerHTML += `<div><b>${user.name}</b> <button class="btn1" onclick="makeAdmin(${user.userId}, '${groupId}')">Make Admin</button> </div>`
                     }
-                } else {
-                    usersElm.innerHTML += `<div>${user.name} <button class="btn1" onclick="makeAdmin(${user.userId}, ${groupId})">Make Admin</button> </div>`
-                }
-            })
+                })
+            } else {
+                participants.forEach(user => {
+                    if (user.isAdmin === true) {
+                        usersElm.innerHTML += `<div><b>${user.name}</b> Group Admin </div>`
+                    } else {
+                        usersElm.innerHTML += `<div><b>${user.name}</b></div>`
+                    }
+                })
+            }
             usersElm.innerHTML += `<input type="hidden" name="groupid" value="${groupId}">`
         })
 }
@@ -313,4 +310,30 @@ function removeFromGroup(userId, groupId) {
             document.querySelector(".popup2").style.display = "none";
             showGroup(groupId)
         })
+}
+
+const searchBar = document.getElementById('search');
+
+searchBar.addEventListener('input', event => {
+    try {
+        const groupId = localStorage.getItem('groupId')
+        const searchQuery = event.target.value;;
+        const usersElm = document.getElementById("addParticipant")
+        axios.get(`http://localhost:2000/admin/search/${groupId}?searchQuery=${searchQuery}`)
+            .then(response => {
+                const users = response.data.users;
+                usersElm.innerHTML = '';
+                users.forEach(user => {
+                    showSearchedUser(user, usersElm, groupId);
+                })
+                usersElm.innerHTML += `<button class="btn1" type="submit">Add</button>`
+            });
+    } catch { err => console.log(err) }
+})
+
+function showSearchedUser(user, usersElm, groupId) {
+    try{
+    usersElm.innerHTML += `<div><input type="checkbox" name="user" value="${user.id}">${user.name}</div>`
+    usersElm.innerHTML += `<input type="hidden" name="groupid" value="${groupId}">`
+} catch { err => console.log(err) }
 }

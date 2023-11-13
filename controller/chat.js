@@ -7,18 +7,18 @@ const { Op } = require("sequelize");
 const S3Services = require('../services/S3services');
 const cron = require('node-cron');
 
-cron.schedule('* 20 * * * *', async () => {
-    console.log('code is running in cron')
-    const currentTimestamp = new Date();
-    currentTimestamp.setHours(currentTimestamp.getHours() - 48);
-    const chat = await Chat.findAll({ where: { createdAt: { [Op.lt]: currentTimestamp } } })
+// cron.schedule('59 59 23 * * *', async () => {
+//     console.log('code is running in cron')
+//     const currentTimestamp = new Date();
+//     currentTimestamp.setHours(currentTimestamp.getHours() - 48);
+//     const chat = await Chat.findAll({ where: { createdAt: { [Op.lt]: currentTimestamp } } })
 
-    chat.forEach(async chat => {
-        await AchivedChat.create({ message: chat.message, name: chat.name, userId: chat.userId, groupId: chat.groupId })
-    })
+//     chat.forEach(async chat => {
+//         await AchivedChat.create({ message: chat.message, name: chat.name, userId: chat.userId, groupId: chat.groupId })
+//     })
 
-    await Chat.destroy({ where: { createdAt: { [Op.lt]: currentTimestamp } } })
-});
+//     await Chat.destroy({ where: { createdAt: { [Op.lt]: currentTimestamp } } })
+// });
 
 exports.postChat = async (req, res, next) => {
     try {
@@ -38,6 +38,7 @@ exports.groupChat = async (req, res, next) => {
         lastMsgId = parseFloat(req.query.lastmsgid)
         const groupid = req.params.id;
         const chat = await Chat.findAll({ where: { groupId: groupid } })
+        console.log(chat);
         const newChat = await Chat.findAll({ where: { id: { [Op.gt]: lastMsgId } } });
         const nChat = newChat.map(chat => ({
             id: chat.id,
