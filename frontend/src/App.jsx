@@ -1,9 +1,12 @@
 import React from 'react'
+import Login from './components/Login'
+import ChatApp from './components/ChatApp'
 
 function App() {
   return (
     <div>
-      hello World
+      {/* <Login /> */}
+      <ChatApp />
     </div>
   )
 }

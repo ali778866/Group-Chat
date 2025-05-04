@@ -1,1 +1,9 @@
 @import "tailwindcss";
+@plugin "daisyui";
+
+
+body {
+  @apply bg-no-repeat bg-cover bg-center min-h-screen;
+  background-image: url("/wallpaper.png");
+  color: #ffff;
+}
